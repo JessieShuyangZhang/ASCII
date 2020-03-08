@@ -18,7 +18,7 @@
                 <!-- player-name holds text message from console, need to change class name later -->
                 <div class="character-name" id="name-0">Welcome to the ASCII Game!</div>
 
-                <div class="menuquestion" id="menuquestion-0">Which character class do you want to select? <br><br><pre>1. Warrior               2. Sorcerer </pre></div>
+                <div class="menuquestion" id="menuquestion-0">Which character class do you want to select? <br><br><pre>Warrior                     Sorcerer </pre></div>
                 <div class="menuquestion" id="menuquestion-1"></div>
                 <div class="menuquestion" id="menuquestion-2"></div>
 
@@ -42,7 +42,7 @@
                     <button class="btn-fight" onclick="UIController.setCharChoice(1)"><i class="ion-flash"></i>fight</button>
                     <button class="btn-battle-items" onclick="UIController.setCharChoice(2)"><i class="ion-cube"></i>items</button>
                     <button class="btn-battle-status" onclick="UIController.setCharChoice(3)"><i class="ion-information-circled"></i>status</button>
-                    <button class="btn-run" onclick="UIController.setCharChoice(4)"><i class="ion-android-walk"></i>run</button>
+                    <button class="btn-run" onclick="UIController.setCharChoice(4)"><i class="ion-android-walk"></i>escape</button>
                     <button class="btn-quit" onclick="UIController.setCharChoice(5)"><i class="ion-android-exit"></i>Save&Quit</button>
                 </div>
 
@@ -63,7 +63,7 @@
                 </div> -->
             </div>
             
-            <input type="text" placeholder="Your choice" class="user-choice" style="display:none">
+            <input type="text" placeholder="Your choice" class="user-choice" id="user-choice" style="display:none">
             <!-- <button class="btn-submit"><i class="ion-ios-arrow-forward"></i>Go</button> -->
             <!-- <div class="player-1-panel">
                 <div class="player-name" id="name-1">Player 2</div>

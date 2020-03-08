@@ -2,6 +2,7 @@ var UIController = (function(){
 	var DOMstrings = {
 		characterName: '.character-name',
 		menuQuestion:'.menuquestion',
+		inputBox: 'user-choice',
 		userChoice: '.user-choice',
 		modal: 'character-status', //id
 		closeModal: '.closemodal',
@@ -83,11 +84,12 @@ var UIController = (function(){
 			document.getElementById('menuquestion-0').textContent = obj.message;
 			document.getElementById('menuquestion-1').textContent = obj.itemsString;
 			document.getElementById('menuquestion-2').textContent = obj.menu;
+			document.getElementById(DOMstrings.inputBox).style.display = 'block';
 		},
 
 		displayGameMenu: function(texts){
 			if(texts.intro){
-				document.getElementById('menuquestion-0').textContent = texts.intro;
+				document.getElementById('menuquestion-0').innerHTML=texts.intro.replace(/(?:\r\n|\r|\n)/g, '<br>');
 			}
 			document.getElementById('menuquestion-1').textContent = texts.milesleft;
 			//document.getElementById('menuquestion-2').textContent = texts.menu;
@@ -122,15 +124,14 @@ var UIController = (function(){
 		},
 
 		displayAttackResult: function(str){
-			document.getElementById('menuquestion-0').textContent = str;
+			document.getElementById('menuquestion-0').innerHTML = str.replace(/\n\r?/g, '<br>');
 		},
 
 		displayEnemyAction: function(obj){
-			document.getElementById('menuquestion-1').textContent = obj.string;
-
-			document.getElementById('menuquestion-2').textContent = obj.message;
-			document.getElementById('menuquestion-1').innerHTML = document.getElementById('menuquestion-1').innerHTML.replace(/\n\r?/g, '<br />');
-			document.getElementById('menuquestion-2').innerHTML = document.getElementById('menuquestion-2').innerHTML.replace(/\n\r?/g, '<br />');
+			// document.getElementById('menuquestion-1').textContent = obj.string;
+			// document.getElementById('menuquestion-2').textContent = obj.message;
+			document.getElementById('menuquestion-1').innerHTML = obj.string.replace(/\n\r?/g, '<br />');
+			document.getElementById('menuquestion-2').innerHTML = obj.message.replace(/\n\r?/g, '<br />');
 		},
 
 		clearField: function(){
@@ -151,6 +152,10 @@ var UIController = (function(){
 			document.getElementById(DOMstrings.gameMenuBtn).style.display = 'none';
 			document.getElementById(DOMstrings.fightMenuBtn).style.display = 'none';
 			document.getElementById(DOMstrings.battleMenuBtn).style.display = 'none';
+		},
+
+		hideInputBox: function(){
+			document.getElementById(DOMstrings.inputBox).style.display = 'none';
 		},
 
 		displayEnemyImg: function() {
@@ -180,6 +185,9 @@ var controller = (function( UICtrl){
 	
 	var executeChoice = function(choice){
 		console.log('in executeChoice');
+		if(!atItem){
+			UICtrl.hideInputBox();
+		}
 		if(isNaN(choice)){
 			console.log('non existence?');
 			return 0; 
@@ -265,16 +273,20 @@ var controller = (function( UICtrl){
 	var ctrlMenuSelection = function(choice){
 		var ret;
 		if(choice=='0'){//going back from item menu
+			UICtrl.clearMenuFields();
 			UICtrl.displayGameMenu(gameMenu());
 		}
-		else if(choice=='1'){ //go forward
-			atBattle = true;
-			atMenu = false;
-			// char_enem =forward();
-			UICtrl.displayBattleMenu(forward());
+		else if(choice=='1'){ //go forward			
+			var obj = forward();
+			if(obj.enemy){
+				atBattle = true;
+				atMenu = false;
+				UICtrl.displayBattleMenu(obj);
+			}
 		}
 		else if(choice=='2'){ //open item menu
-			// atMenu = true;
+			atMenu = false;
+			atItem = true;
 			var obj = itemMenu(false);
 			UICtrl.hideAllBtns();
 			UICtrl.displayItemMenu(obj);
@@ -334,14 +346,21 @@ var controller = (function( UICtrl){
 	var ctrlFightSelection = function(choice){
 		var ret;
 		if(!isNaN(choice) && choice > 0) { //need more conditions to check
-			if(choice=='1'){ //attack
-				var str = enemy.getAttacked(character);
-				// char_enem = returnCharEnem();
-				console.log(str);
+			if(choice=='1' || choice=='2' || choice=='3'){
+				if(choice=='1'){ //attack
+					ret = enemy.getAttacked(character);			
+				}
+				else if(choice=='2'){//strike				
+					ret = enemy.getStruck(character);				
+				}
+				else if(choice=='3'){
+					ret = character.specialAttack(enemy);
+				}
+				console.log(ret);
 				UICtrl.clearMenuFields();
-				UICtrl.displayAttackResult(str);
-				// then the enemies turn
+				UICtrl.displayAttackResult(ret);
 				UICtrl.hideAllBtns();
+				// then the enemies turn
 				UICtrl.displayEnemyAction(enemy.enemyAction(character));
 				if(enemy.health <= 0){
 					//enemy.itemchance not implemented yet			
@@ -375,25 +394,18 @@ var controller = (function( UICtrl){
 						UICtrl.displayBattleMenu();
 					}, 3000);	
 				}			
-
-			}
-			else if(choice=='2'){//strike
-				enemy.getStruck(character);
-			}
-			else if(choice=='3'){//special abilities
-
-
-
-
 			}
 			else if(choice=='4'){ //back
 				atBattle = true;
 				atFight = false;
+				UICtrl.clearMenuFields();
 				UICtrl.displayBattleMenu({character:character, enemy:enemy});
 			}
 			else{
 				console.log('Please input a valid command.');
 			}
+			
+			
 			UICtrl.clearField();
 		}
 	}
@@ -402,19 +414,57 @@ var controller = (function( UICtrl){
 		//TOOD: implement
 		var ret;
 		if(!isNaN(choice)) {
-			if(choice==='0'){
-				atBattle = true;
+			if(choice=='0'){				
 				atItem = false;
-				console.log(character, enemy);
-				UICtrl.displayBattleMenu({character:character, enemy: enemy});//how to go back to previous level??
-
+				console.log(character, enemy);				
+				UICtrl.clearMenuFields();
+				if(enemy){
+					atBattle = true;
+					UICtrl.displayBattleMenu({character:character, enemy: enemy});
+				}
+				else{
+					atMenu = true;
+					UICtrl.displayGameMenu({ //is this right?
+						intro: NaN,
+						milesleft: 'You have '+character.miles+'  miles left.',
+						menu:NaN
+					});
+				}
+				UICtrl.hideInputBox();
+				UICtrl.clearField();
 			}
-			else{
-				console.log('???');
-
-
+			else if(choice>=1 && choice<=character.itemlist.length){
+				UICtrl.hideInputBox();
+				var itemname = character.itemlist[choice-1];
+				ret = 'You used the '+itemname+'! \r\n';
+				if(itemname=='Potion'){
+					ret += character.potion();
+				}else if (itemname == "Mega Potion"){
+					ret += character.megapotion();
+				}
+				else if (itemname == "Lucy"){
+					ret += character.lucy();
+				}
+				else if (itemname == "Flying Bat"){
+					ret += character.flyingbat();
+				}
+				else if (itemname == "Guitar"){
+					ret += character.guitar();
+				}
+				else{
+					console.log('item does not exist');
+				}
+				character.itemlist.splice(choice-1,1);
+				console.log(ret);
+				UICtrl.clearMenuFields();
+				document.getElementById('menuquestion-0').innerHTML=ret.replace(/(?:\r\n|\r|\n)/g, '<br>');
+				setTimeout(function(){
+					var obj = itemMenu(true);
+					UICtrl.hideAllBtns();
+					UICtrl.displayItemMenu(obj);}
+				,3000);
+				UICtrl.clearField();
 			}
-			UICtrl.clearField();
 		}
 	}
 
@@ -455,10 +505,11 @@ var controller = (function( UICtrl){
 			menu: _menu
 		};
 	}
+
 	var itemMenu= function(canchoose){
 		var _message, _itemsString, _menu;			
-		if(character.itemlist.length === '0'){
-			_message = 'You have no items left.';
+		if(character.itemlist.length == '0'){
+			_message = 'You have no items left. Enter 0 to go back.';
 		}
 		else{
 			_message = 'The items you currently have are: ';
@@ -468,9 +519,9 @@ var controller = (function( UICtrl){
 			}
 			console.log('itemsString:'+_itemsString);//debug
 			if(canchoose){
-				_menu = 'Which one would you like to use? Enter the number to use. Enter 0 to go back.';
+				_menu = 'Which one would you like to use? Enter 0 to go back.';
 			}
-			else{
+			else{				
 				_menu='Enter 0 to go back.';
 			}
 		}
@@ -480,40 +531,68 @@ var controller = (function( UICtrl){
 			menu: _menu
 		};
 	}
+
 	var getCharacterStatus= function(){
 		return {charstat:character.status(), enemy:enemy};
 	}
+
 	var forward= function(){ //move forward in the game world
-		while(character.miles > 0 && !character.isFighting && character.health > 0){
+		var encounteritem = false;
+		while(character.miles > 0 && !character.isFighting && character.health > 0 && !encounteritem){
 			character.changeMiles(-1);				
 			console.log(character.miles + ' miles left.');
-			document.getElementById('menuquestion-0').textContent=character.miles + ' miles left.';
-			var prob = Math.floor(Math.random()*100)+1;
-			if(prob % 10 < 3){
+			document.getElementById('menuquestion-0').textContent=character.miles + ' miles left.';//not working...too fast to see?
+			var prob = Math.floor(Math.random()*100);
+			if(prob < 20){
 				enemy = new Guitarist();
 				console.log('you ran into an enemy',enemy);
 				UICtrl.displayEnemyImg();
 				character.isFighting = true;
-
+				prob = Math.floor(Math.random()*100);
 				//todo: customize enemies
-				if(prob <= 15){
+				if(prob <= 20){
 
 				}
-				else if(prob<=25){
+				else if(prob<=30){
 
 				}
-				else if(prob<=40){
+				else if(prob<=45){
 
 				}
 				else if(prob<=60){
 
 				}
-				else if(prob<=80){
+				else if(prob<=85){
 
 				}
 				else{
 
 				}
+			}
+			else if(prob % 100 > 94){ //5% item encounter
+			// else{ //temporary 80% for debugging purpose
+				encounteritem = true;
+				var prob2 = Math.floor(Math.random()*10);
+				var message;
+				if (prob2 == 0 ) {
+					message = "You found a half opened Mega Potion! \r\nHopefully, it's safe.";
+					character.itemlist.push("Mega Potion");
+				}
+				else if(prob2 == 1){
+					message = "You found a trashed guitar? \r\nYou look cool now holding trash!";
+					character.itemlist.push("Guitar");
+				}
+				else{
+					message = "You found a potion! \r\nMaybe someone threw out one after having 999 of them.";
+					character.itemlist.push("Potion");
+				}
+				console.log(message);
+				UICtrl.clearMenuFields();
+				UICtrl.displayGameMenu({
+					intro: message,
+					milesleft: 'You have '+character.miles+'  miles left.',
+					menu:NaN
+				});
 			}
 		}
 		return{
@@ -521,26 +600,31 @@ var controller = (function( UICtrl){
 			enemy: enemy
 		}
 	}
+
 	var gainExperience= function(){
 		var leveldiff = character.level - enemy.level;
 		var _experience;
+		var msg;
 		if(Math.abs(leveldiff) <= 2){
 			_experience = Math.floor(Math.random()*(leveldiff+9)+1);
-			character.increaseexp(_experience);
+			msg += character.increaseexp(_experience);
 		}
 		else if(leveldiff >= 3){
 			_experience = Math.floor(Math.random()*9+1);
-			character.increaseexp(_experience);
+			msg += character.increaseexp(_experience);
 		}
 		else if(leveldiff <= -3){
 			_experience = Math.floor(Math.random()*leveldiff*2+1);
-			character.increaseexp(_experience);
+			msg += character.increaseexp(_experience);
 		}
 		if(character.experience >= 10){
-			character.levelup();
+			msg += character.levelup();
 			// character.status(); //should we call this??
 		}
-	}	
+		console.log('in controller.gainExperience()', msg);
+		return msg;
+	}
+
 	var calculateOrder= function(){
 		if(character.speed > enemy.speed){
 			return true;
@@ -557,12 +641,7 @@ var controller = (function( UICtrl){
 			}
 		}
 	}
-	/*var fight= function(){
-		var input, input2;
-	}*/
-	/*var getStruck=function(){ //not implemented yet
-		enemy.getStruck(character); //different depending on enemy class
-	}*/
+
 	var returnCharEnem= function(){
 		return{
 			character: character,

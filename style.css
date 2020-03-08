@@ -237,6 +237,10 @@ i {
 
 /* Modal Content/Box */
 .modal-content {
+  color:purple;
+  font-weight: 32px;
+  font-size:20px;
+  text-align: center;
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;

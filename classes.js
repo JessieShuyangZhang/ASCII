@@ -16,17 +16,16 @@ class Character{
 		this.name = 'warrior!'; //for temporary purpose
 		this.itemlist = [
 		'Potion', 'Potion', 'Mega Potion'];
-		this.abilities = [];
+		this.ability = null;
 	}
 	getItem(name){ //character gets an Item 
 		this.itemlist.push(name);
 	}
-	//itemMenu(){} ??
 	potion(){
-		increaseHealth(5);
+		return this.increaseHealth(5);
 	}
 	megapotion(){
-		increaseHealth(10);
+		return this.increaseHealth(10);
 	}
 	lucy(){ //message yet to implement
 		takedamage(-9999);
@@ -55,36 +54,42 @@ class Character{
 		this.miles += _miles;
 	}
 	increaseexp(_experience){
-		console.log("you gained "+_experience+" experience points."); //should show on UI
+		var message = "You gained "+_experience+" experience points. "; //should show on UI
 		this.experience += _experience;
+		return message;
 	}
 	changeattack(_attack){
+		var message;
 		if(_attack > 0){
-			console.log("Attack increased by "+_attack);
+			message += "Attack increased by "+_attack;
 		}else if(_attack < 0){
-			console.log("Attack decreased by -"+_attack);
+			message += "Attack decreased by -"+_attack;
 		}
 		this.attack += _attack;
-		//this.attack += _attack;//why twice?
+		return message;
 	}
 	changedef(_defense){
+		var message;
 		if(_defense > 0){
-			console.log("Defense increased by "+_defense);
+			message += "Defense increased by "+_defense;
 		}else if(_defense < 0){
-			console.log("Defense decreased by -"+_defense);
+			message += "Defense decreased by -"+_defense;
 		}
 		this.defense += _defense;
+		return message;
 	}
 	changespeed(_speed){
+		var message;
 		if(_speed > 0){
-			console.log("Defense increased by "+_speed);
+			message += "Defense increased by "+_speed;
 		}else if(_speed < 0){
-			console.log("Defense decreased by -"+_speed);
+			message += "Defense decreased by -"+_speed;
 		}
 		this.speed += _speed;
+		return message;
 	}
 	levelup(){
-		console.log("You gained a level up!");
+		console.log("You gained a level up! ");
 		var c = Math.floor(Math.random()*100%3)+1;
 		this.experience -= 10;
 		this.changeattack(Math.floor(Math.random()*100%3));
@@ -111,20 +116,23 @@ class Character{
 		return message;
 	}
 	increaseHealth(num){
-		console.log("Health increased by "+num);
+		var message="Health increased by "+num+'. ';
 		this.health += num;
 		if(this.health > this.maxhealth){
 			this.health = this.maxhealth;
-			console.log("You are at max health!");
+			message+="\r\nYou are at max health!";
 		}
+		return message;
 	}
 	changeMaxHealth(_maxhealth){
+		var message;
 		if(_maxhealth > 0){
-			console.log("Max health increased by "+_maxhealth);
+			message="Max health increased by "+_maxhealth+'. ';
 		} else if(_maxhealth < 0){
-			console.log("Max health decreased by -"+_maxhealth);
+			message="Max health decreased by -"+_maxhealth+'. ';
 		}
 		this.maxhealth += _maxhealth;
+		return message;
 	}
 	setFight(maybe){
 		this.isFighting = maybe;
@@ -150,9 +158,7 @@ class Character{
 			won: this.won
 		};
 	}
-	/* functions not sure how to implement yet
-	specialAttack(){}
-	}*/
+	
 }
 
 class Warrior extends Character{
@@ -164,7 +170,7 @@ class Warrior extends Character{
 		this.speed = 4;
 		this.health = 22;
 		this.className = 'Warrior';
-		this.abilities.push('Green Tea');
+		this.abilities='Green Tea';
 	}
 	greenatea(enemy){
 		var message = 'You threw Green Tea at the '+enemy.name+'. It only caused some first degree burns...';
@@ -184,13 +190,8 @@ class Warrior extends Character{
 		this.level += 1;
 
 	}
-	specialAttack(ability){
-		if(ability === 'Green Tea'){
-			this.greenatea(enemy);
-		}
-		else{
-			console.log('item does not exist');
-		}
+	specialAttack(enemy){
+		return this.greenatea(enemy);
 	}
 }
 
@@ -203,37 +204,27 @@ class Sorcerer extends Character{
 		this.speed = 6;
 		this.health = 24;
 		this.className = 'Sorcerer';
-		this.abilities.push('Physics Homework');
+		this.abilities='Physics Homework';
 	}
 	phyicshw(enemy){
 		var message = 'You threw your physics homework at the '+enemy.name+'. Hundreds of papers'+enemy.name+' hit on the head.';
-		enemy.takedamage((this.magic-enemy.magicdefense)*2);
+		message += enemy.takedamage((this.magic-enemy.magicdefense)*2);
 		return message;
 	}
-	mathAbility(enemy){
+	/*mathAbility(enemy){
 		var message = 'You showed the '+enemy.name+' how to solve 1 + 1! The'+enemy.name+' was enlightened!';
 		enemy.takedamage((this.magic-enemy.magicdefense)*3);
 		return message;
-	}
-	levelup(){
+	}*/
+	/*levelup(){ //disabled gaining special ability
 		super.levelup();
 		if(level==='2'){
 			console.log('You learned Math!');
 			abilities.push('Math');
 		}
-	}
-	specialAttack(ability){
-		console.log('You used '+ ability);
-		if(ability === 'Math'){
-			this.mathAbility(enemy);
-		}
-		else if(ability === 'Physics Homework'){
-			this.physicshw(enemy);
-		}
-		else{
-			console.log('item does not exist');
-		}
-		//return the message?
+	}*/
+	specialAttack(choice, enemy){
+		return this.physicshw(enemy);;
 	}
 }
 
@@ -332,8 +323,21 @@ class Guitarist extends Enemy{
 			message: _message
 		}
 	}
-	getStruck(){
-		console.log('get struck not yet implemented');
+	getStruck(character){
+		var message = "You attempted to hit the Hippie Guitarist with his guitar!\r\n";
+		if (this.guitar == false) {
+			message += "His guitar is broken and does no damage...";
+		}
+		else if (Math.floor(Math.random()*100) < 30) {
+			super.takedamage((character.attack - this.defense)*3);
+			message += "His guitar broke. The Hippie Guitarist started sobbing due to his lack of soul.";
+			this.guitar = false;
+		}
+		else {
+			message += "The Hippie Guitarist had a firm grip on his guitar...";
+		}
+		console.log(message);
+		return message;
 	}
 	// itemChance(){}
 }
