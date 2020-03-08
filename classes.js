@@ -224,7 +224,7 @@ class Sorcerer extends Character{
 		}
 	}*/
 	specialAttack(choice, enemy){
-		return this.physicshw(enemy);;
+		return this.physicshw(enemy);
 	}
 }
 
@@ -256,12 +256,35 @@ class Enemy{
 	}
 	changedef(defense){//print message yet to be implemented
 		this.defense += defense;
+		var str = this.name +"'s defense ";
+		str += defense >=0 ? 'increased' : 'decreased';
+		str += ' by ' + Math.abs(defense);
+		console.log(str);
+		return str;
 	}
-	changeattack(attack){//print message yet to be implemented
-		this.attack += attack;
+	changemagicdef(defense){//print message yet to be implemented
+		this.magicdefense += defense;
+		var str = this.name +"'s magic defense ";
+		str += defense >=0 ? 'increased' : 'decreased';
+		str += ' by ' + Math.abs(defense);
+		console.log(str);
+		return str;
 	}
-	changespeed(speed){//print message yet to be implemented
-		this.speed = speed;
+	changeattack(x){//print message yet to be implemented
+		this.attack += x;
+		var str = this.name +"'s attack ";
+		str += x >=0 ? 'increased' : 'decreased';
+		str += ' by ' + Math.abs(x);
+		console.log(str);
+		return str;
+	}
+	changespeed(x){//print message yet to be implemented
+		this.speed = x;
+		var str = this.name +"'s speed ";
+		str += x >=0 ? 'increased' : 'decreased';
+		str += ' by ' + Math.abs(x);
+		console.log(str);
+		return str;
 	}
 	enemystatus(){ //returns an object of all info instead of cout
 		return{
@@ -328,9 +351,9 @@ class Guitarist extends Enemy{
 		if (this.guitar == false) {
 			message += "His guitar is broken and does no damage...";
 		}
-		else if (Math.floor(Math.random()*100) < 30) {
-			super.takedamage((character.attack - this.defense)*3);
+		else if (Math.floor(Math.random()*100) < 30) {			
 			message += "His guitar broke. The Hippie Guitarist started sobbing due to his lack of soul.";
+			message += super.takedamage((character.attack - this.defense)*3);
 			this.guitar = false;
 		}
 		else {
@@ -340,4 +363,266 @@ class Guitarist extends Enemy{
 		return message;
 	}
 	// itemChance(){}
+}
+
+class Cat extends Enemy{
+	constructor(){
+		//(name, attack, defense, magicdefense, speed, level, health)
+		super('Black Cat of Death', 
+			Math.floor(Math.random()*100%3+4),
+			Math.floor(Math.random()*100%4+2),
+			Math.floor(Math.random()*100%3+1),
+			Math.floor(Math.random()*100%10),
+			1,
+			Math.floor(Math.random()*100%3+9));
+	}
+	enemyAction(character){
+		var _string = "It's the Black Cat of Death's turn.";
+		var _message = '';
+		if(Math.floor(Math.random()*1000%100) < 30){
+			if(Math.floor(Math.random()*1000%100) < 30){			
+				var msg = character.takedamage((this.attack- character.defense)*3); 
+				_message+="The Black Cat of Death scratched your face! "+msg;
+			}
+			else{
+				_message+="The Black Cat of Death was overcome with tiredness to move.";
+			}
+		}
+		else{
+			var msg = character.takedamage(this.attack-character.defense);
+			_message = "The Black Cat of Death used its powers of die!"+msg;			
+		}
+		return{
+			string: _string,
+			message: _message
+		}
+	}
+	getStruck(character){
+		var message = "You attempted to beat the Black Cat of Death!\r\n";
+		if (Math.floor(Math.random()*100) < 30) {			
+			message += "You directly hit the Black Cat of Death! It whimpered and meowed softly... ";
+			message += super.takedamage((character.attack - this.defense)*3);
+		}
+		else {
+			message += "The cat nimbly dodged the attack...";
+		}
+		console.log(message);
+		return message;
+	}
+// itemChance(){}
+}
+
+class Juggler extends Enemy{
+	constructor(){
+		//(name, attack, defense, magicdefense, speed, level, health)
+		super('Juggler', 
+			Math.floor(Math.random()*100%3+5),
+			Math.floor(Math.random()*100%3+2),
+			Math.floor(Math.random()*100%2),
+			Math.floor(Math.random()*100%3+3),
+			2,
+			Math.floor(Math.random()*100%3+7));
+	}
+	enemyAction(character){
+		var _string = "It's the Juggler's turn.";
+		var _message = '';
+		if(Math.floor(Math.random()*1000%100) < 30){
+			if(Math.floor(Math.random()*1000%100) < 30){			
+				var msg = character.takedamage((this.attack- character.defense)*2); 
+				_message+="The Juggler threw a knife at you! "+msg;
+			}
+			else{
+				_message+="The Juggler is hoping to win the audition to perform at Lacey's Carnival to impress the kids.";
+			}
+		}
+		else{
+			var msg = character.takedamage(this.attack-character.defense);
+			_message = "The Juggler threw his balls at you!"+msg;			
+		}
+		return{
+			string: _string,
+			message: _message
+		}
+	}
+	getAttacked(character){//print message yet to be implemented
+		var str = 'You stole his balls and threw them back at him!';
+		var str2 = this.takedamage(character.attack - this.defense);
+		str += str2;
+		return str;
+	}
+	getStruck(character){
+		var message = "You tried juggling four balls in front of him! \r\n";
+		if (Math.floor(Math.random()*100) < 30) {			
+			message += "The Juggler was shocked at your ball handling skills!";
+			message += super.takedamage((character.attack - this.defense)*3);
+		}
+		else {
+			message += "You slipped on one of his balls and failed... ";
+		}
+		console.log(message);
+		return message;
+	}
+// itemChance(){}
+}
+
+class Turtle extends Enemy{
+	constructor(){
+		//(name, attack, defense, magicdefense, speed, level, health)
+		super('Crazy Turtle', 
+			Math.floor(Math.random()*100%3+4),
+			Math.floor(Math.random()*100%2+7),
+			Math.floor(Math.random()*100%2+7),
+			0,
+			2,
+			Math.floor(Math.random()*100%3+10));
+	}
+	enemyAction(character){
+		var _string = "It's the Crazy Turtle's turn.";
+		var _message = '';
+		if(Math.floor(Math.random()*1000%100) < 30){
+			if(Math.floor(Math.random()*1000%100) < 40){			
+				var msg = character.takedamage((this.attack- character.defense)*2); 
+				_message+="The Crazy Turtle jumped 10 meters in the air and flattened you! "+msg;
+			}
+			else{
+				_message+="The turtle slowly moved towards you...";
+			}
+		}
+		else{
+			var msg = character.takedamage(this.attack-character.defense);
+			_message = "The Crazy Turtle drove at super speed and rammed in you!"+msg;			
+		}
+		return{
+			string: _string,
+			message: _message
+		}
+	}
+	getAttacked(character){
+		str = super.getAttacked() + " Maybe there's a way to lower its defenses...";
+		return str;
+	}
+	getStruck(character){
+		var message = "You attempted to break open the turtle's shell with your hand! \r\n";
+		if (Math.floor(Math.random()*100) < 70) {			
+			message += "You chopped open the turtle's shell!";
+			message += super.takedamage((character.attack - this.defense)*3);
+			message += super.changedef(-5);
+			message += super.changemagicdef(-5);
+		}
+		else {
+			message += "Your hand wasn't strong enough... ";
+			message += character.takedamage(1);
+		}
+		console.log(message);
+		return message;
+	}
+// itemChance(){}
+}
+
+class Lucy extends Enemy{ //not finished yet
+	constructor(){
+		//(name, attack, defense, magicdefense, speed, level, health)
+		super('Lucy', 
+			Math.floor(Math.random()*100%3+4),
+			Math.floor(Math.random()*100%2+7),
+			Math.floor(Math.random()*100%2+7),
+			0,
+			2,
+			Math.floor(Math.random()*100%3+10));
+	}
+	enemyAction(character){
+		var _string = "It's the Crazy Turtle's turn.";
+		var _message = '';
+		if(Math.floor(Math.random()*1000%100) < 30){
+			if(Math.floor(Math.random()*1000%100) < 40){			
+				var msg = character.takedamage((this.attack- character.defense)*2); 
+				_message+="The Crazy Turtle jumped 10 meters in the air and flattened you! "+msg;
+			}
+			else{
+				_message+="The turtle slowly moved towards you...";
+			}
+		}
+		else{
+			var msg = character.takedamage(this.attack-character.defense);
+			_message = "The Crazy Turtle drove at super speed and rammed in you!"+msg;			
+		}
+		return{
+			string: _string,
+			message: _message
+		}
+	}
+	getAttacked(character){
+		str = super.getAttacked() + " Maybe there's a way to lower its defenses...";
+		return str;
+	}
+	getStruck(character){
+		var message = "You attempted to break open the turtle's shell with your hand! \r\n";
+		if (Math.floor(Math.random()*100) < 70) {			
+			message += "You chopped open the turtle's shell!";
+			message += super.takedamage((character.attack - this.defense)*3);
+			message += super.changedef(-5);
+			message += super.changemagicdef(-5);
+		}
+		else {
+			message += "Your hand wasn't strong enough... ";
+			message += character.takedamage(1);
+		}
+		console.log(message);
+		return message;
+	}
+// itemChance(){}
+}
+
+class Nerd extends Enemy{
+	constructor(){
+		//(name, attack, defense, magicdefense, speed, level, health)
+		super('Nerd', 
+			Math.floor(Math.random()*100%3+4),
+			Math.floor(Math.random()*100%2+7),
+			Math.floor(Math.random()*100%2+7),
+			0,
+			2,
+			Math.floor(Math.random()*100%3+10));
+	}
+	enemyAction(character){
+		var _string = "It's the Crazy Turtle's turn.";
+		var _message = '';
+		if(Math.floor(Math.random()*1000%100) < 30){
+			if(Math.floor(Math.random()*1000%100) < 40){			
+				var msg = character.takedamage((this.attack- character.defense)*2); 
+				_message+="The Crazy Turtle jumped 10 meters in the air and flattened you! "+msg;
+			}
+			else{
+				_message+="The turtle slowly moved towards you...";
+			}
+		}
+		else{
+			var msg = character.takedamage(this.attack-character.defense);
+			_message = "The Crazy Turtle drove at super speed and rammed in you!"+msg;			
+		}
+		return{
+			string: _string,
+			message: _message
+		}
+	}
+	getAttacked(character){
+		str = super.getAttacked() + " Maybe there's a way to lower its defenses...";
+		return str;
+	}
+	getStruck(character){
+		var message = "You attempted to break open the turtle's shell with your hand! \r\n";
+		if (Math.floor(Math.random()*100) < 70) {			
+			message += "You chopped open the turtle's shell!";
+			message += super.takedamage((character.attack - this.defense)*3);
+			message += super.changedef(-5);
+			message += super.changemagicdef(-5);
+		}
+		else {
+			message += "Your hand wasn't strong enough... ";
+			message += character.takedamage(1);
+		}
+		console.log(message);
+		return message;
+	}
+// itemChance(){}
 }

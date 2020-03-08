@@ -18,7 +18,7 @@ var UIController = (function(){
 		replayBtn: 'btn-again', //id
 		replayBtns: '.btn-again',
 		enemyImg: 'enemy-image', //id
-
+		enemyGif:'enemy-gif' //id of img tag
 	}
 
 	var charchoice;
@@ -160,6 +160,14 @@ var UIController = (function(){
 
 		displayEnemyImg: function() {
 			document.getElementById(DOMstrings.enemyImg).style.display = 'block';
+		},
+
+		hideEnemyImg: function(){
+			document.getElementById(DOMstrings.enemyImg).style.display = 'none';
+		},
+
+		changeEnemyImg: function(filename){
+			document.getElementById(DOMstrings.enemyGif).src = filename;
 		},
 
 		defeatEnemy: function(enemy){
@@ -327,10 +335,28 @@ var controller = (function( UICtrl){
 				UICtrl.showCharacterStatus(obj);
 			}
 			else if(choice=='4'){ //run
+				var escaped = runsuccess();
+				var message;
+				if(escaped){
+					message = 'You have successfully ran away.';
+					character.isFighting = false;
+					enemy = null;
+					atMenu = true;
+					atBattle = false;
+					UICtrl.hideEnemyImg();
+					UICtrl.clearMenuFields();
+					UICtrl.displayGameMenu({
+						intro: message,
+						milesleft: 'You have '+character.miles+'  miles left.',
+						menu:NaN
+					});
+				}else{
+					message = 'You have failed at running away.';
+					UICtrl.clearMenuFields();
+					UICtrl.displayBattleMenu();
+					document.getElementById('menuquestion-0').textContent=message;
+				}
 				
-
-
-
 			}
 			else if(choice=='5'){ //save and quit?? not implemented yet
 				/*atBattle = false;
@@ -544,30 +570,36 @@ var controller = (function( UICtrl){
 			document.getElementById('menuquestion-0').textContent=character.miles + ' miles left.';//not working...too fast to see?
 			var prob = Math.floor(Math.random()*100);
 			if(prob < 20){
-				enemy = new Guitarist();
+				prob = Math.floor(Math.random()*100);			
+				
+				//todo: customize enemies
+				if(prob <= 20){
+					enemy = new Cat();
+					UICtrl.changeEnemyImg('cat.gif');
+				}
+				else if(prob<=30){
+					enemy = new Lucy();
+					UICtrl.changeEnemyImg('lucy.gif');
+				}
+				else if(prob<=45){
+					enemy = new Turtle();
+					UICtrl.changeEnemyImg('turtle.gif');
+				}
+				else if(prob<=60){
+					enemy = new Juggler();
+					UICtrl.changeEnemyImg('juggler.gif');
+				}
+				else if(prob<=85){ //guitarist
+					enemy = new Guitarist();
+					UICtrl.changeEnemyImg('guitarist.gif');
+				}
+				else{
+					enemy = new Nerd();
+					UICtrl.changeEnemyImg('nerd.gif');
+				}
 				console.log('you ran into an enemy',enemy);
 				UICtrl.displayEnemyImg();
 				character.isFighting = true;
-				prob = Math.floor(Math.random()*100);
-				//todo: customize enemies
-				if(prob <= 20){
-
-				}
-				else if(prob<=30){
-
-				}
-				else if(prob<=45){
-
-				}
-				else if(prob<=60){
-
-				}
-				else if(prob<=85){
-
-				}
-				else{
-
-				}
 			}
 			else if(prob % 100 > 94){ //5% item encounter
 			// else{ //temporary 80% for debugging purpose
@@ -619,13 +651,12 @@ var controller = (function( UICtrl){
 		}
 		if(character.experience >= 10){
 			msg += character.levelup();
-			// character.status(); //should we call this??
 		}
 		console.log('in controller.gainExperience()', msg);
 		return msg;
 	}
 
-	var calculateOrder= function(){
+	var calculateOrder= function(){ //didn't use, assumed user starts each fight
 		if(character.speed > enemy.speed){
 			return true;
 		}
@@ -639,6 +670,27 @@ var controller = (function( UICtrl){
 			else {
 				return false;
 			}
+		}
+	}
+
+	var runsuccess = function(){
+		var threshhold, rand, message;
+		threshhold = 70;
+		if(character.level<enemy.level){
+			threshold = 30;
+		}else if(character.level==enemy.level){
+			threshold = 50;
+		}
+		rand = Math.floor(Math.random()*100);
+		if(rand < threshold){
+			// message = 'You have successfully ran away.';
+			character.isFighting = false;
+			enemy = null;		
+			return true;			
+		}
+		else{
+			// message = 'You have failed at running away.';
+			return false;
 		}
 	}
 
