@@ -1,169 +1,3 @@
-var playerController = (function(){
-	//"world.h", battlesystem,
-	var character, enemy, inBattle, userTurn, isStart;
-
-	return{
-		createCharacter: function(choice){
-			isStart = true;
-			if(choice==='1'){
-				//todo: warrior
-			}
-			else{
-				//todo: sorcerer
-			}
-			character = new Character();
-			return character;
-		},
-		gameMenu: function(){ //did not include all of original  function in 'world.h'
-			var _intro, _forsave, _menu;
-			//this should only print when game first starts
-			if(isStart){
-				_intro = 'Soham Sonthi has been committing unthinkable crimes against humanity! It is your job to stop him! You need to travel 40 miles to get to him.';
-			}
-			else{
-				_intro='';
-			}
-			if(character.isFighting){ //not finished
-				_forsave = 'You were in the middle of a fight!';
-				//battlesystem?
-			}
-			if(character.health >= 0){
-				_milesleft = 'You have '+character.miles+'  miles left,';
-				_menu = 'Enter 1 to go forward, 2 to open item menu, 3 to open status menu. Enter 9 to skip to final boss.';
-			}
-			else{
-				_menu = 'You have been defeated.';
-			}
-			return {
-				intro: _intro,
-				milesleft: _milesleft,
-				menu: _menu
-			};
-		},
-		itemMenu: function(canchoose){
-			var _message, _itemsString, _menu;			
-			if(character.itemlist.length === '0'){
-				_message = 'You have no items left.';
-			}
-			else{
-				_message = 'The items you currently have are: ';
-				_itemsString = '';
-				for(var i=0; i<character.itemlist.length; i++){
-					_itemsString+= (i+1) +'.'+character.itemlist[i]+ '    '; //whitespace not working??
-				}
-				console.log('itemsString:'+_itemsString);//debug
-				if(canchoose){
-					_menu = 'Which one would you like to use? Enter the number to use. Enter 0 to go back.';
-				}
-				else{
-					_menu='Enter 0 to go back.';
-				}
-			}
-			return {
-				message: _message,
-				itemsString: _itemsString,
-				menu: _menu
-			};
-		},
-		getCharacterStatus: function(){
-			return character.status();
-		},
-		forward: function(){ //move forward in the world
-			while(character.miles > 0 && !character.isFighting && character.health > 0){
-				character.changeMiles(-1);
-				console.log(character.miles + ' miles left.');
-				var prob = Math.floor(Math.random()*100)+1;
-				if(prob % 10 < 3){
-					enemy = new Guitarist();
-					console.log('you ran into an enemy',enemy);
-					character.isFighting = true;
-
-					//todo: customize enemies
-					if(prob <= 15){
-
-					}
-					else if(prob<=25){
-
-					}
-					else if(prob<=40){
-
-					}
-					else if(prob<=60){
-
-					}
-					else if(prob<=80){
-
-					}
-					else{
-
-					}
-				}
-			}
-			return{
-				character: character,
-				enemy: enemy
-			}
-		},
-		gainExperience: function(){
-			var leveldiff = character.level - enemy.level;
-			var _experience;
-			if(Math.abs(leveldiff) <= 2){
-				_experience = Math.floor(Math.random()*(leveldiff+9)+1);
-				character.increaseexp(_experience);
-			}
-			else if(leveldiff >= 3){
-				_experience = Math.floor(Math.random()*9+1);
-				character.increaseexp(_experience);
-			}
-			else if(leveldiff <= -3){
-				_experience = Math.floor(Math.random()*leveldiff*2+1);
-				character.increaseexp(_experience);
-			}
-			if(character.experience >= 10){
-				character.levelup();
-				// character.status(); //should we call this??
-			}
-		},
-		fight: function(){
-			var input, input2;
-			
-
-		},
-		calculateOrder: function(){
-			if(character.speed > enemy.speed){
-				return true;
-			}
-			else if(character.speed > enemy.speed){
-				return false;
-			}
-			else{
-				if(Math.floor(Math.random()*2+1)%2 == 0){
-					return true;
-				}
-				else {
-					return false;
-				}
-			}
-		},
-		getAttacked: function(){
-			var str = 'You attacked the '+enemy.name+'!';
-			enemy.takedamage(character.attack-enemy.defense);
-			return str;
-		}, 
-		getStruck:function(){
-			enemy.getStruck(character); //different depending on enemy class
-		},
-		getCharEnem: function(){
-			return{
-				character: character,
-				enemy: enemy
-			}
-		}
-	};
-})();
-
-
-
 var UIController = (function(){
 	var DOMstrings = {
 		characterName: '.character-name',
@@ -173,7 +7,7 @@ var UIController = (function(){
 		closeModal: '.closemodal',
 		modalContent: '.modal-content',
 		modalText: 'modal-text'
-	};
+	}
 
 	return{
 		getInput: function(){
@@ -201,8 +35,8 @@ var UIController = (function(){
 			newHtml = newHtml.replace('%10-exp%', 10-obj.experience);
 			newHtml = newHtml.replace('%milesleft%', obj.milesleft);
 
-			if(obj.isFighting && obj.tempenemy){
-				newHtml += '<p>Currently in the middle of fighting '+obj.tempenemy.name+ '</p>';
+			if(obj.isFighting){
+				newHtml += '<p>Currently in the middle of fighting '+obj.enemy.name+ '</p>';
 			}
 			else if(obj.health === 0){
 				newHtml += '<p>THIS CHARACTER HAS UNFORTUNATELY EXPERIENCED MATH AND DIED. </p>';
@@ -222,7 +56,9 @@ var UIController = (function(){
 		},
 
 		displayGameMenu: function(texts){
-			document.getElementById('menuquestion-0').textContent = texts.intro;
+			if(texts.intro){
+				document.getElementById('menuquestion-0').textContent = texts.intro;
+			}
 			document.getElementById('menuquestion-1').textContent = texts.milesleft;
 			document.getElementById('menuquestion-2').textContent = texts.menu;
 		},
@@ -249,9 +85,22 @@ var UIController = (function(){
 		displayAttackResult: function(str){
 			document.getElementById('menuquestion-0').textContent = str;
 		},
+
+		displayEnemyAction: function(obj){
+			document.getElementById('menuquestion-1').textContent = obj.string;
+			document.getElementById('menuquestion-2').textContent = obj.message;
+		},
+
 		clearField: function(){
 			document.querySelector(DOMstrings.userChoice).value = "";
 		},
+
+		clearMenuFields: function(){
+			document.getElementById('menuquestion-0').textContent = '';
+			document.getElementById('menuquestion-1').textContent = '';
+			document.getElementById('menuquestion-2').textContent = '';
+		},
+		
 		getDOMstrings: function(){
 			return DOMstrings;
 		}
@@ -259,11 +108,12 @@ var UIController = (function(){
 
 })();
 
-var controller = (function(playerCtrl, UICtrl){
+var controller = (function( UICtrl){
+	//from playercontroller
+	var character, enemy, inBattle, userTurn;//, isStart;
 	var isStart, atMenu, atBattle, atFight, atItem, char_enem; 
-	var setupEventListeners = function(){ //for future use
-		var DOM = UICtrl.getDOMstrings();
-		
+	var setupEventListeners = function(){
+		var DOM = UICtrl.getDOMstrings();		
 		document.addEventListener('keypress', function(event){
 			if(event.keyCode == 13 || event.which === 13){ // pressed enter
 				var choice = UICtrl.getInput();
@@ -273,7 +123,7 @@ var controller = (function(playerCtrl, UICtrl){
 				}
 				if(isStart){
 					ctrlSetCharacter(choice);
-					var texts = playerCtrl.gameMenu();
+					var texts =gameMenu();
 					// console.log(texts);
 					UICtrl.displayGameMenu(texts);
 					isStart = false;
@@ -282,10 +132,6 @@ var controller = (function(playerCtrl, UICtrl){
 					atFight = false;
 					atItem = false;
 				}
-				/*else{
-					//UICtrl.displayGameMenu(playerCtrl.gameMenu());
-					atMenu = true;
-				}*/
 				else if(atMenu){
 					ctrlMenuSelection(choice);
 				}
@@ -312,14 +158,138 @@ var controller = (function(playerCtrl, UICtrl){
 
 	var ctrlSetCharacter = function(choice){		
 		// console.log(choice);
-		if(!isNaN(choice) && choice > 0) { //need more conditions to check
-			character = playerCtrl.createCharacter(choice);
-			UICtrl.displayCharacterName(character.name); //needs to change after polymorphism
-			// console.log(character);
+		if(!isNaN(choice) && (choice==='1' || choice==='2')) { //need more conditions to check
+			character = createCharacter(choice);
+			UICtrl.displayCharacterName(character.className);
 			UICtrl.clearField();
 		}
 	}
-	
+
+	var ctrlMenuSelection = function(choice){
+		var ret;
+		if(choice==='0'){//going back from item menu
+			UICtrl.displayGameMenu(gameMenu());
+		}
+		else if(choice==='1'){ //go forward
+			atBattle = true;
+			atMenu = false;
+			char_enem =forward();
+			UICtrl.displayBattleMenu(char_enem);
+		}
+		else if(choice==='2'){ //open item menu
+			// atMenu = true;
+			var obj = itemMenu(false);	
+			UICtrl.displayItemMenu(obj);
+		}
+		else if(choice==='3'){//status
+			var obj = getCharacterStatus();
+			console.log(obj);
+			UICtrl.showCharacterStatus(obj);
+		}
+		else if(choice==='9'){//choice 9 not implemented yet
+			console.log('skip to final boss');
+		}
+		else{
+			ret = 'please input a valid command';
+			console.log(ret);
+		}
+		UICtrl.clearField();		
+	}
+
+	var ctrlBattleSelection = function(choice){
+		var ret;
+		if(!isNaN(choice) && choice > 0) { //need more conditions to check
+			if(choice==='1'){ //fight
+				atBattle = false;
+				atFight = true;
+				console.log('trying to fight');
+				UICtrl.displayFightMenu();
+			}
+			else if(choice==='2'){//item
+				atBattle = false;
+				atItem = true;
+				var obj = itemMenu(true);
+				UICtrl.displayItemMenu(obj);
+			}
+			else if(choice==='3'){//status
+				var obj = getCharacterStatus();
+				UICtrl.showCharacterStatus(obj);
+			}
+			else if(choice==='4'){ //run
+				
+
+
+
+			}
+			else if(choice==='5'){ //save and quit?? not implemented yet
+				/*atBattle = false;
+				atFight = false;*/
+			}
+			else{
+				console.log('Please input a valid command.');
+			}
+			UICtrl.clearField();
+		}
+	}
+
+	var ctrlFightSelection = function(choice){
+		var ret;
+		if(!isNaN(choice) && choice > 0) { //need more conditions to check
+			if(choice==='1'){ //attack
+				var str = attackEnem();
+				char_enem = returnCharEnem();
+				console.log(str);
+				UICtrl.clearMenuFields();
+				UICtrl.displayAttackResult(str);
+				// UICtrl.displayBattleMenu(char_enem);
+
+
+				// then the enemies turn
+				UICtrl.displayEnemyAction(char_enem.enemy.enemyAction(char_enem.character));
+				if(char_enem.enemy.health <= 0){
+					//enemy.itemchance not implemented yet
+					console.log('You have defeated the enemy');
+					document.getElementById('menuquestion-0').textContent='You have defeated the '+char_enem.enemy.name+'!';
+					char_enem.enemy = null;
+					gainExperience();
+					char_enem.character.isFighting = false;
+					atFight = false;
+					atBattle = false;
+					atMenu = true;
+					//setTimeout(function(){
+						UICtrl.displayGameMenu(gameMenu());
+					//}, 2000);	
+				}
+				else{
+					atBattle = true;
+					atFight = false;
+					setTimeout(function(){
+						UICtrl.displayBattleMenu();
+					}, 3000);	
+				}			
+
+			}
+			else if(choice==='2'){//strike
+				getStruck();
+			}
+			else if(choice==='3'){//special abilities
+
+
+
+
+			}
+			else if(choice==='4'){ //back
+				atBattle = true;
+				atFight = false;
+				UICtrl.displayBattleMenu(char_enem);
+			}
+			else{
+				console.log('Please input a valid command.');
+			}
+			UICtrl.clearField();
+		}
+	}
+
 	var ctrlItemSelection = function(choice){
 		//TOOD: implement
 		var ret;
@@ -340,106 +310,159 @@ var controller = (function(playerCtrl, UICtrl){
 		}
 	}
 
-	var ctrlFightSelection = function(choice){
-		var ret;
-		if(!isNaN(choice) && choice > 0) { //need more conditions to check
-			if(choice==='1'){ //attack				
-				/*var str = char_enem.enemy.getAttacked(char_enem.character);*/
-				var str = playerCtrl.getAttacked();
-				char_enem = playerCtrl.getCharEnem();
-				console.log(str);
-				UICtrl.displayAttackResult(str);
-				// UICtrl.displayBattleMenu(char_enem);
-				atBattle = true;
-				atFight = false;
-			}
-			else if(choice==='2'){//strike
-				playerCtrl.getStruck();
-			}
-			else if(choice==='3'){//special abilities
-
-
-
-
-			}
-			else if(choice==='4'){ //back
-				atBattle = true;
-				atFight = false;
-				UICtrl.displayBattleMenu(char_enem);
-			}
-			else{
-				console.log('Please input a valid command.');
-			}
-			UICtrl.clearField();
-		}
-	}
-
-	var ctrlBattleSelection = function(choice){
-		var ret;
-		if(!isNaN(choice) && choice > 0) { //need more conditions to check
-			if(choice==='1'){ //fight
-				atBattle = false;
-				atFight = true;
-				console.log('trying to fight');
-				UICtrl.displayFightMenu();
-			}
-			else if(choice==='2'){//item
-				atBattle = false;
-				atItem = true;
-				var obj = playerCtrl.itemMenu(true);
-				UICtrl.displayItemMenu(obj);
-			}
-			else if(choice==='3'){//status
-				var obj = playerCtrl.getCharacterStatus();
-				UICtrl.showCharacterStatus(obj);
-			}
-			else if(choice==='4'){ //run
-				
-
-
-
-			}
-			else if(chocie==='5'){ //save and quit?? not implemented yet
-				atBattle = true;
-				atFight = false;
-			}
-			else{
-				console.log('Please input a valid command.');
-			}
-			UICtrl.clearField();
-		}
-	}
-
-	var ctrlMenuSelection = function(choice){
-		var ret;
-		if(choice==='0'){//going back from item menu
-			// console.log('here');
-			UICtrl.displayGameMenu(playerCtrl.gameMenu());
-		}
-		else if(choice==='1'){ //go forward
-			atBattle = true;
-			atMenu = false;
-			char_enem =playerCtrl.forward();
-			UICtrl.displayBattleMenu(char_enem);
-		}
-		else if(choice==='2'){ //open item menu
-			// atMenu = true;
-			var obj = playerCtrl.itemMenu(false);	
-			UICtrl.displayItemMenu(obj);
-		}
-		else if(choice==='3'){//status
-			var obj = playerCtrl.getCharacterStatus();	
-			UICtrl.showCharacterStatus(obj);
-		}
-		else if(choice==='9'){//choice 9 not implemented yet
-			console.log('skip to final boss');
+	var createCharacter = function(choice){
+		var character;
+		isStart = true;
+		if(choice==='1'){
+			character = new Warrior();
 		}
 		else{
-			ret = 'please input a valid command';
-			console.log(ret);
+			character = new Sorcerer();
 		}
-		UICtrl.clearField();
+		return character;
+	}
+
+	var gameMenu= function(){ //did not include all of original  function in 'world.h'
+		var _intro, _forsave, _menu;
+		//this should only print when game first starts
+		if(isStart){
+			_intro = 'Soham Sonthi has been committing unthinkable crimes against humanity! It is your job to stop him! You need to travel 40 miles to get to him.';
+			isStart=false;
+		}
+		if(character.isFighting){ //not finished
+			_forsave = 'You were in the middle of a fight!';
+			//battlesystem?
+		}
+		if(character.health >= 0){
+			_milesleft = 'You have '+character.miles+'  miles left,';
+			_menu = 'Enter 1 to go forward, 2 to open item menu, 3 to open status menu. Enter 9 to skip to final boss.';
+		}
+		else{
+			_menu = 'You have been defeated.';
+		}
+		return {
+			intro: _intro,
+			milesleft: _milesleft,
+			menu: _menu
+		};
+	}
+	var itemMenu= function(canchoose){
+		var _message, _itemsString, _menu;			
+		if(character.itemlist.length === '0'){
+			_message = 'You have no items left.';
+		}
+		else{
+			_message = 'The items you currently have are: ';
+			_itemsString = '';
+			for(var i=0; i<character.itemlist.length; i++){
+				_itemsString+= (i+1) +'.'+character.itemlist[i]+ '    '; //whitespace not working??
+			}
+			console.log('itemsString:'+_itemsString);//debug
+			if(canchoose){
+				_menu = 'Which one would you like to use? Enter the number to use. Enter 0 to go back.';
+			}
+			else{
+				_menu='Enter 0 to go back.';
+			}
+		}
+		return {
+			message: _message,
+			itemsString: _itemsString,
+			menu: _menu
+		};
+	}
+	var getCharacterStatus= function(){
+		return character.status();
+	}
+	var forward= function(){ //move forward in the world
+		while(character.miles > 0 && !character.isFighting && character.health > 0){
+			character.changeMiles(-1);				
+			console.log(character.miles + ' miles left.');
+			document.getElementById('menuquestion-0').textContent=character.miles + ' miles left.';
+			var prob = Math.floor(Math.random()*100)+1;
+			if(prob % 10 < 3){
+				enemy = new Guitarist();
+				console.log('you ran into an enemy',enemy);
+				character.isFighting = true;
+
+				//todo: customize enemies
+				if(prob <= 15){
+
+				}
+				else if(prob<=25){
+
+				}
+				else if(prob<=40){
+
+				}
+				else if(prob<=60){
+
+				}
+				else if(prob<=80){
+
+				}
+				else{
+
+				}
+			}
+		}
+		return{
+			character: character,
+			enemy: enemy
+		}
+	}
+	var gainExperience= function(){
+		var leveldiff = character.level - enemy.level;
+		var _experience;
+		if(Math.abs(leveldiff) <= 2){
+			_experience = Math.floor(Math.random()*(leveldiff+9)+1);
+			character.increaseexp(_experience);
+		}
+		else if(leveldiff >= 3){
+			_experience = Math.floor(Math.random()*9+1);
+			character.increaseexp(_experience);
+		}
+		else if(leveldiff <= -3){
+			_experience = Math.floor(Math.random()*leveldiff*2+1);
+			character.increaseexp(_experience);
+		}
+		if(character.experience >= 10){
+			character.levelup();
+			// character.status(); //should we call this??
+		}
+	}
+	var fight= function(){
+		var input, input2;
 		
+
+	}
+	var calculateOrder= function(){
+		if(character.speed > enemy.speed){
+			return true;
+		}
+		else if(character.speed > enemy.speed){
+			return false;
+		}
+		else{
+			if(Math.floor(Math.random()*2+1)%2 == 0){
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	var attackEnem= function(){
+		return enemy.getAttacked(character);
+	}
+	var getStruck=function(){ //not implemented yet
+		enemy.getStruck(character); //different depending on enemy class
+	}
+	var returnCharEnem= function(){
+		return{
+			character: character,
+			enemy: enemy
+		}
 	}
 
 	return{
@@ -460,6 +483,6 @@ var controller = (function(playerCtrl, UICtrl){
 		}
 	};
 
-})(playerController, UIController);
+})(UIController);
 
 controller.init();

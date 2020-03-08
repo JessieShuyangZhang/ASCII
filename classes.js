@@ -54,7 +54,7 @@ class Character{
 	changeMiles(_miles){
 		this.miles += _miles;
 	}
-	increaseexp(_experence){
+	increaseexp(_experience){
 		console.log("you gained "+_experience+" experience points."); //should show on UI
 		this.experience += _experience;
 	}
@@ -85,26 +85,30 @@ class Character{
 	}
 	levelup(){
 		console.log("You gained a level up!");
-		var c = Math.floor(Math.random()*4)+1;
+		var c = Math.floor(Math.random()*100%3)+1;
 		this.experience -= 10;
-		this.changeattack(Math.floor(Math.random()*3)+1);
-		this.changedef(Math.floor(Math.random()*3)+1);
-		this.changespeed(Math.floor(Math.random()*3)+1);
+		this.changeattack(Math.floor(Math.random()*100%3));
+		this.changedef(Math.floor(Math.random()*100%2));
+		this.changespeed(Math.floor(Math.random()*100%3));
 		this.increaseHealth(c);
 		this.changeMaxHealth(c);
 		this.level += 1;
 	}
 	takedamage(damage){
+		var message='';
 		if(damage<0){
 			damage = 0;
 		}
 		this.health -= damage;
+		message += "You took "+damage+" damage.";
 		console.log("You took "+damage+" damage.");
 		if(this.health > 0){
+			message += "You have "+this.health+" HP left."
 			console.log("You have "+this.health+" HP left.");
 		}else{
 			this.health = 0;
 		}
+		return message;
 	}
 	increaseHealth(num){
 		console.log("Health increased by "+num);
@@ -150,6 +154,89 @@ class Character{
 	specialAttack(){}
 	}*/
 }
+
+class Warrior extends Character{
+	constructor(){
+		super();
+		this.attack = 6;
+		this.magic = 2;
+		this.defense = 2;
+		this.speed = 4;
+		this.health = 22;
+		this.className = 'Warrior';
+		this.abilities.push('Green Tea');
+	}
+	greenatea(enemy){
+		var message = 'You threw Green Tea at the '+enemy.name+'. It only caused some first degree burns...';
+		enemy.takedamage(1);
+		return message;
+	}
+	levelup(){
+		// super.levelup();
+		console.log("You gained a level up!");
+		var c = Math.floor(Math.random()*100%2)+2;
+		this.experience -= 10;
+		this.changeattack(Math.floor(Math.random()*100%3)+1);
+		this.changedef(Math.floor(Math.random()*100%2));
+		this.changespeed(Math.floor(Math.random()*100%2));
+		this.increaseHealth(c);
+		this.changeMaxHealth(c);
+		this.level += 1;
+
+	}
+	specialAttack(ability){
+		if(ability === 'Green Tea'){
+			this.greenatea(enemy);
+		}
+		else{
+			console.log('item does not exist');
+		}
+	}
+}
+
+class Sorcerer extends Character{
+	constructor(){
+		super();
+		this.attack = 5;
+		this.magic = 4;
+		this.defense = 2;
+		this.speed = 6;
+		this.health = 24;
+		this.className = 'Sorcerer';
+		this.abilities.push('Physics Homework');
+	}
+	phyicshw(enemy){
+		var message = 'You threw your physics homework at the '+enemy.name+'. Hundreds of papers'+enemy.name+' hit on the head.';
+		enemy.takedamage((this.magic-enemy.magicdefense)*2);
+		return message;
+	}
+	mathAbility(enemy){
+		var message = 'You showed the '+enemy.name+' how to solve 1 + 1! The'+enemy.name+' was enlightened!';
+		enemy.takedamage((this.magic-enemy.magicdefense)*3);
+		return message;
+	}
+	levelup(){
+		super.levelup();
+		if(level==='2'){
+			console.log('You learned Math!');
+			abilities.push('Math');
+		}
+	}
+	specialAttack(ability){
+		console.log('You used '+ ability);
+		if(ability === 'Math'){
+			this.mathAbility(enemy);
+		}
+		else if(ability === 'Physics Homework'){
+			this.physicshw(enemy);
+		}
+		else{
+			console.log('item does not exist');
+		}
+		//return the message?
+	}
+}
+
 
 class Enemy{
 	//not sure if constructor is correct
@@ -197,11 +284,8 @@ class Enemy{
 	}
 	//takes in a character object
 	getAttacked(character){//print message yet to be implemented
-		//"you attacked the "+this.name;
-		// this.takedamage(character.attack - this.defense);
-		var str = 'You attacked the'+this.name+'! ';
+		var str = 'You attacked the '+this.name+'! ';
 		var str2 = this.takedamage(character.attack - this.defense);
-		console.log('str2?',str2);
 		str += str2;
 		return str;
 	}
@@ -211,7 +295,13 @@ class Enemy{
 class Guitarist extends Enemy{
 	constructor(){
 		//(name, attack, defense, magicdefense, speed, level, health)
-		super('Hippie Guitarist', 1,1,10,2,2,7);
+		super('Hippie Guitarist', 
+			Math.floor(Math.random()*100%3+5),
+			Math.floor(Math.random()*100%3+2),
+			Math.floor(Math.random()*100%4),
+			Math.floor(Math.random()*100%3+4),
+			1,
+			Math.floor(Math.random()*100%4+10));
 		this.guitar = true;
 	}
 	enemyAction(character){
@@ -220,20 +310,20 @@ class Guitarist extends Enemy{
 		if(this.guitar == false){
 			_message = 'The Hippie Guitarist continued to cry. ';
 		}
-		else if(Math.floor(Math.random()*100+1) < 30){
+		else if(Math.floor(Math.random()*1000%100) < 30){
 			_message="The Hippie Guitarist played a funky riff. ";
-			if(Math.floor(Math.random()*100+1) < 30){
-				_message+="You lost all your hearing.";
-				character.takedamage(this.attack- character.defense*3);
+			if(Math.floor(Math.random()*1000%100) < 30){			
+				var msg = character.takedamage((this.attack- character.defense)*3);
+				_message+="You lost all your hearing."+msg;
 			}
 			else{
 				_message+="The melody was actually not too bad???";
 			}
 		}
 		else{
-			_message = "The Hippie Guitarist whacked you on the head with his guitar!";
-			character.takedamage(this.attack- character.defense);
-			if(Math.floor(Math.random()*100+1) < 50){
+			var msg = character.takedamage(this.attack-character.defense);
+			_message = "The Hippie Guitarist whacked you on the head with his guitar!"+msg;
+			if(Math.floor(Math.random()*1000%100) < 50){
 				this.guitar = false;
 				_message += "The guitar broke. The Hippie Guitarist started sobbing due to his lack of soul. ";
 			}
