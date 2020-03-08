@@ -65,6 +65,29 @@ body {
 }
 
 
+.enemy-image-row::after,
+.image-row::after {
+    /*display: flex;*/
+    content:"";
+    clear:both;
+    display: table;
+}
+
+.enemy-image-col{
+    cursor: default;
+    text-align: center;
+    float: left;
+    width: 100%;
+    padding:5px;
+}
+.image-col {
+    cursor: pointer;
+    text-align: center;
+    float: left;
+    width: 50%;
+    padding:5px;
+}
+
 
 /**********************************************
 *** PLAYERS
@@ -75,7 +98,7 @@ body {
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-weight: 200;
+    font-weight: 350;
     margin-top: 20px;
     margin-bottom: 10px;
     /*position: relative;*/
@@ -87,6 +110,7 @@ body {
     font-weight: 500;
     color: #3694c7;
     margin-bottom: 10px;
+    /*white-space: pre;*/
 }
 
 .active { background-color: #f7f7f7; }
@@ -126,6 +150,7 @@ button {
     position: absolute;
     width: 200px;
     left: 50%;
+    top:500px;
     transform: translateX(-50%);
     color: #555;
     background: none;
@@ -155,10 +180,27 @@ i {
     margin-top: -4px;
     transition: margin 0.3s;
 }
+.btn-gamemenu{
+    /*position: fixed;*/
+    top: 500px;
+}
+.btn-forward { left: 20%;}
+.btn-items { left: 40%;}
+.btn-status {left: 60%;}
+.btn-boss {left: 80%;}
 
-/*.btn-new { top: 45px;}
-.btn-roll { top: 403px;}
-.btn-hold { top: 467px;}*/
+.btn-fight { left: 10%;}
+.btn-battle-items { left: 30%;}
+.btn-battle-status {left: 50%;}
+.btn-run {left: 70%;}
+.btn-quit {left: 90%;}
+
+.btn-attack { left: 20%;}
+.btn-strike { left: 40%;}
+.btn-special {left: 60%;}
+.btn-back {left: 80%;}
+
+.btn-replay {left:50%;}
 
 .dice {
     position: absolute;

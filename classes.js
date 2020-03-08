@@ -100,10 +100,10 @@ class Character{
 			damage = 0;
 		}
 		this.health -= damage;
-		message += "You took "+damage+" damage.";
+		message += "\r\nYou took "+damage+" damage. ";
 		console.log("You took "+damage+" damage.");
 		if(this.health > 0){
-			message += "You have "+this.health+" HP left."
+			message += "You have "+this.health+" HP left.\r\n";
 			console.log("You have "+this.health+" HP left.");
 		}else{
 			this.health = 0;
@@ -239,7 +239,6 @@ class Sorcerer extends Character{
 
 
 class Enemy{
-	//not sure if constructor is correct
 	constructor(name, attack, defense, magicdefense, speed, level, health){
 		this.name = name;
 		this.attack = attack;
@@ -313,7 +312,7 @@ class Guitarist extends Enemy{
 		else if(Math.floor(Math.random()*1000%100) < 30){
 			_message="The Hippie Guitarist played a funky riff. ";
 			if(Math.floor(Math.random()*1000%100) < 30){			
-				var msg = character.takedamage((this.attack- character.defense)*3);
+				var msg = character.takedamage((this.attack- character.defense)*3); 
 				_message+="You lost all your hearing."+msg;
 			}
 			else{

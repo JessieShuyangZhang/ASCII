@@ -18,17 +18,52 @@
                 <!-- player-name holds text message from console, need to change class name later -->
                 <div class="character-name" id="name-0">Welcome to the ASCII Game!</div>
 
-                <div class="menuquestion" id="menuquestion-0">Which character class do you want to select? <br>1. Warrior   &nbsp;  &nbsp; 2. Sorcerer </div>
+                <div class="menuquestion" id="menuquestion-0">Which character class do you want to select? <br><br><pre>1. Warrior               2. Sorcerer </pre></div>
                 <div class="menuquestion" id="menuquestion-1"></div>
                 <div class="menuquestion" id="menuquestion-2"></div>
-                
+
+                <div class="image-row" id="images">
+                    <div class="image-col"><img src="warrior.jpg" alt="warrior" height="40%" width="40%" onclick="UIController.setCharChoice(1)"></div>
+                    <div class="image-col"><img src="sorcerer.webp" alt="sorcerer"height="40%" width="40%" onclick="UIController.setCharChoice(2)"></div>
+                </div>
+
+                <div class="enemy-image-row" id="enemy-image" style="display:none">
+                    <div class="enemy-image-col"><img src="guitarist.gif" alt="warrior" height="25%" width="25%" ></div>                    
+                </div>
+
+                <div class='btn-gamemenu' id='btn-gamemenu'>
+                    <button class="btn-forward" onclick="UIController.setCharChoice(1)"><i class="ion-arrow-right-a"></i>Go Forward</button>
+                    <button class="btn-items" onclick="UIController.setCharChoice(2)"><i class="ion-cube"></i>items</button>
+                    <button class="btn-status" onclick="UIController.setCharChoice(3)"><i class="ion-information-circled"></i>status</button>
+                    <button class="btn-boss" onclick="UIController.setCharChoice(4)"><i class="ion-ios-flame"></i>final boss</button>
+                </div>
+
+                <div class='btn-battlemenu' id='btn-battlemenu'>
+                    <button class="btn-fight" onclick="UIController.setCharChoice(1)"><i class="ion-flash"></i>fight</button>
+                    <button class="btn-battle-items" onclick="UIController.setCharChoice(2)"><i class="ion-cube"></i>items</button>
+                    <button class="btn-battle-status" onclick="UIController.setCharChoice(3)"><i class="ion-information-circled"></i>status</button>
+                    <button class="btn-run" onclick="UIController.setCharChoice(4)"><i class="ion-android-walk"></i>run</button>
+                    <button class="btn-quit" onclick="UIController.setCharChoice(5)"><i class="ion-android-exit"></i>Save&Quit</button>
+                </div>
+
+                 <div class='btn-fightmenu' id='btn-fightmenu'>
+                    <button class="btn-attack" onclick="UIController.setCharChoice(1)"><i class="ion-heart-broken"></i>attack</button>
+                    <button class="btn-strike" onclick="UIController.setCharChoice(2)"><i class="ion-hammer"></i>strike</button>
+                    <button class="btn-special" onclick="UIController.setCharChoice(3)"><i class="ion-ios-flask"></i>special</button>
+                    <button class="btn-back" onclick="UIController.setCharChoice(4)"><i class="ion-arrow-left-a"></i>back</button>
+                </div>
+
+                <div class='btn-again' id='btn-again' style="display:none">
+                    <button class="btn-replay" onclick="window.location.reload()"><i class="ion-refresh"></i>play again</button>
+                </div>
                 <!-- <div class="player-current-box">
                     <div class="player-current-label">Current HP</div>
                     
                     <div class="player-current-score" id="current-0">11</div>
                 </div> -->
             </div>
-            <input type="text" placeholder="Your choice" class="user-choice">
+            
+            <input type="text" placeholder="Your choice" class="user-choice" style="display:none">
             <!-- <button class="btn-submit"><i class="ion-ios-arrow-forward"></i>Go</button> -->
             <!-- <div class="player-1-panel">
                 <div class="player-name" id="name-1">Player 2</div>
@@ -39,10 +74,7 @@
                 </div>
             </div> -->
             
-            <!-- <button class="btn-new"><i class="ion-ios-plus-outline"></i>New game</button>
-            <button class="btn-roll"><i class="ion-ios-loop"></i>Roll dice</button>
-            <button class="btn-hold"><i class="ion-ios-download-outline"></i>Hold</button> -->
-
+            
             
             
             <!-- <img src="dice-5.png" alt="Dice" class="dice" id='dice-1'>
