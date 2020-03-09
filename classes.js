@@ -204,10 +204,10 @@ class Sorcerer extends Character{
 		this.speed = 6;
 		this.health = 24;
 		this.className = 'Sorcerer';
-		this.abilities='Physics Homework';
+		this.abilities = 'Physics Homework';
 	}
-	phyicshw(enemy){
-		var message = 'You threw your physics homework at the '+enemy.name+'. Hundreds of papers'+enemy.name+' hit on the head.';
+	physicshw(enemy){
+		var message = 'You threw your physics homework at the '+enemy.name+'. Hundreds of papers hit ' +enemy.name+ ' on the head.';
 		message += enemy.takedamage((this.magic-enemy.magicdefense)*2);
 		return message;
 	}
@@ -223,7 +223,7 @@ class Sorcerer extends Character{
 			abilities.push('Math');
 		}
 	}*/
-	specialAttack(choice, enemy){
+	specialAttack(enemy){
 		return this.physicshw(enemy);
 	}
 }
