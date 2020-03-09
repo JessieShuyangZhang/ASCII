@@ -286,6 +286,9 @@ var controller = (function( UICtrl){
 		}
 		else if(choice=='1'){ //go forward			
 			var obj = forward();
+			if(!obj){
+				document.getElementById(DOMstrings.replayBtn).style.display = 'block';
+			}
 			if(obj.enemy){
 				atBattle = true;
 				atMenu = false;
@@ -627,6 +630,9 @@ var controller = (function( UICtrl){
 				});
 			}
 		}
+		if(character.miles == 0){
+			return null;
+		}
 		return{
 			character: character,
 			enemy: enemy
@@ -674,8 +680,8 @@ var controller = (function( UICtrl){
 	}
 
 	var runsuccess = function(){
-		var threshhold, rand, message;
-		threshhold = 70;
+		var threshold, rand, message;
+		threshold = 70;
 		if(character.level<enemy.level){
 			threshold = 30;
 		}else if(character.level==enemy.level){

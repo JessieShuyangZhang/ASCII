@@ -258,7 +258,7 @@ class Enemy{
 		this.defense += defense;
 		var str = this.name +"'s defense ";
 		str += defense >=0 ? 'increased' : 'decreased';
-		str += ' by ' + Math.abs(defense);
+		str += ' by ' + Math.abs(defense)+'. ';
 		console.log(str);
 		return str;
 	}
@@ -266,7 +266,7 @@ class Enemy{
 		this.magicdefense += defense;
 		var str = this.name +"'s magic defense ";
 		str += defense >=0 ? 'increased' : 'decreased';
-		str += ' by ' + Math.abs(defense);
+		str += ' by ' + Math.abs(defense)+'. ';
 		console.log(str);
 		return str;
 	}
@@ -274,7 +274,7 @@ class Enemy{
 		this.attack += x;
 		var str = this.name +"'s attack ";
 		str += x >=0 ? 'increased' : 'decreased';
-		str += ' by ' + Math.abs(x);
+		str += ' by ' + Math.abs(x)+'. ';
 		console.log(str);
 		return str;
 	}
@@ -282,7 +282,7 @@ class Enemy{
 		this.speed = x;
 		var str = this.name +"'s speed ";
 		str += x >=0 ? 'increased' : 'decreased';
-		str += ' by ' + Math.abs(x);
+		str += ' by ' + Math.abs(x)+'. ';
 		console.log(str);
 		return str;
 	}
@@ -498,7 +498,7 @@ class Turtle extends Enemy{
 		}
 	}
 	getAttacked(character){
-		str = super.getAttacked() + " Maybe there's a way to lower its defenses...";
+		var str = super.getAttacked(character) + " Maybe there's a way to lower its defenses...";
 		return str;
 	}
 	getStruck(character){
@@ -523,28 +523,30 @@ class Lucy extends Enemy{ //not finished yet
 	constructor(){
 		//(name, attack, defense, magicdefense, speed, level, health)
 		super('Lucy', 
-			Math.floor(Math.random()*100%3+4),
-			Math.floor(Math.random()*100%2+7),
-			Math.floor(Math.random()*100%2+7),
-			0,
-			2,
-			Math.floor(Math.random()*100%3+10));
+			Math.floor(Math.random()*100%3+6),
+			Math.floor(Math.random()*100%2+2),
+			Math.floor(Math.random()*100%3),
+			Math.floor(Math.random()*100%6+2),
+			3,
+			Math.floor(Math.random()*100%4+12));
+		this.attract = false;
 	}
 	enemyAction(character){
-		var _string = "It's the Crazy Turtle's turn.";
+		var _string = "It's Lucy's turn.";
 		var _message = '';
-		if(Math.floor(Math.random()*1000%100) < 30){
-			if(Math.floor(Math.random()*1000%100) < 40){			
-				var msg = character.takedamage((this.attack- character.defense)*2); 
-				_message+="The Crazy Turtle jumped 10 meters in the air and flattened you! "+msg;
-			}
-			else{
-				_message+="The turtle slowly moved towards you...";
-			}
+		var rand = Math.floor(Math.random()*1000%100);
+		if(rand < 20){			
+			var msg = character.takedamage((this.attack- character.defense)*2); 
+			_message+="Lucy critically stabbed you! "+msg;
+		}
+		else if(rand>70 && this.attract==false){
+			
+			_message = "Lucy used her charm on you. You may not be able to move."+msg;			
+			this.attract = true;
 		}
 		else{
 			var msg = character.takedamage(this.attack-character.defense);
-			_message = "The Crazy Turtle drove at super speed and rammed in you!"+msg;			
+			_message = "Lucy slapped you!"+msg;
 		}
 		return{
 			string: _string,
@@ -552,20 +554,31 @@ class Lucy extends Enemy{ //not finished yet
 		}
 	}
 	getAttacked(character){
-		str = super.getAttacked() + " Maybe there's a way to lower its defenses...";
+		var r = Math.floor(Math.random()*100) % 10;
+		var str;
+		if (this.attract && r < 5) {
+			str = "You were overcome with love to Lucy!";
+		}
+		else {
+			str = "You punched Lucy.";
+			str += super.takedamage(character.attack - this.defense);
+		}
 		return str;
 	}
 	getStruck(character){
-		var message = "You attempted to break open the turtle's shell with your hand! \r\n";
-		if (Math.floor(Math.random()*100) < 70) {			
-			message += "You chopped open the turtle's shell!";
-			message += super.takedamage((character.attack - this.defense)*3);
-			message += super.changedef(-5);
-			message += super.changemagicdef(-5);
+		var message = "You tried to slap Lucy! \r\n";
+		var r = Math.floor(Math.random()*100)%10;
+		if (r < 5 && this.attract==true) {			
+			message += "You were overcome with love to Lucy!";
 		}
-		else {
-			message += "Your hand wasn't strong enough... ";
-			message += character.takedamage(1);
+		else{
+			if(r<4){
+				message += 'You critically hit her!';				
+				message += super.takedamage((character.attack - this.defense)*3);
+			}
+			else {
+				message += "You couldn't bring yourself to slap her... ";
+			}
 		}
 		console.log(message);
 		return message;
@@ -576,29 +589,34 @@ class Lucy extends Enemy{ //not finished yet
 class Nerd extends Enemy{
 	constructor(){
 		//(name, attack, defense, magicdefense, speed, level, health)
-		super('Nerd', 
-			Math.floor(Math.random()*100%3+4),
-			Math.floor(Math.random()*100%2+7),
-			Math.floor(Math.random()*100%2+7),
+		super('Modern Day Nerd', 
 			0,
+			1,
+			1,
+			100,
 			2,
-			Math.floor(Math.random()*100%3+10));
+			Math.floor(Math.random()*100%2)+19);
+		this.rage = false;
 	}
 	enemyAction(character){
-		var _string = "It's the Crazy Turtle's turn.";
+		var _string = "It's the Modern Day Nerd's turn.";
 		var _message = '';
-		if(Math.floor(Math.random()*1000%100) < 30){
-			if(Math.floor(Math.random()*1000%100) < 40){			
-				var msg = character.takedamage((this.attack- character.defense)*2); 
-				_message+="The Crazy Turtle jumped 10 meters in the air and flattened you! "+msg;
-			}
-			else{
-				_message+="The turtle slowly moved towards you...";
-			}
+		if(this.rage){
+			_message += 'The enraged Modern Day Nerd hits you on the head with his wood katana.';
+			_message += character.takedamage(this.attack- character.defense); 
 		}
 		else{
-			var msg = character.takedamage(this.attack-character.defense);
-			_message = "The Crazy Turtle drove at super speed and rammed in you!"+msg;			
+			var r = Math.floor(Math.random()*1000)%100;
+			if(r < 70){
+				_message += "The Modern Day Nerd roasted you with his anime knowledge. You felt bad for the The Modern Day Nerd... so you decided to take some damage.";
+				_message += character.takedamage(1);
+			}
+			else if(r > 80){
+				_message += "The Modern Day Nerd is thinking about what anime figures to buy next weekend.";
+			}
+			else{
+				_message += "The Modern Day Nerd is looking up some anime images from the internet.";
+			}		
 		}
 		return{
 			string: _string,
@@ -606,21 +624,15 @@ class Nerd extends Enemy{
 		}
 	}
 	getAttacked(character){
-		str = super.getAttacked() + " Maybe there's a way to lower its defenses...";
+		var str = "You hit the anime bodypillow that the Modern Day Nerd was holding. \r\n The Modern Day Nerd became enraged due to the damage to his waifu...\r\n Maybe don't do that next time?";
+		str += this.changeattack(10);
+		str += this.takedamage(character.attack- this.defense); 
+		this.rage = true;
 		return str;
 	}
 	getStruck(character){
-		var message = "You attempted to break open the turtle's shell with your hand! \r\n";
-		if (Math.floor(Math.random()*100) < 70) {			
-			message += "You chopped open the turtle's shell!";
-			message += super.takedamage((character.attack - this.defense)*3);
-			message += super.changedef(-5);
-			message += super.changemagicdef(-5);
-		}
-		else {
-			message += "Your hand wasn't strong enough... ";
-			message += character.takedamage(1);
-		}
+		var message = "You questioned the Modern Day Nerd's anime tastes! \r\nYour hit directly hit the heart of Modern Day Nerd!";
+		message += this.takedamage((character.attack- this.defense)*3); 
 		console.log(message);
 		return message;
 	}
